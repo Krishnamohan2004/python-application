@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  vcube-app:
+    build: .
+    container_name: vcube_secure_engine
+    ports:
+      - "5000:5000"
+    volumes:
+      # Mount student database and video catalog JSON files to persist changes
+      - ./students.json:/app/students.json
+      - ./videos.json:/app/videos.json
+      # Mount placement posters folder
+      - ./placements:/app/placements
+    restart: always

@@ -1,0 +1,14 @@
+client/node_modules/
+client/dist/
+.git/
+.gitignore
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.db
+cloudflared.exe
+cloudflared.msi
+Dockerfile
+docker-compose.yml
+*.part
