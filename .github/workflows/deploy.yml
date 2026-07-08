@@ -137,9 +137,18 @@ jobs:
           kubectl set image deployment/vcube-deployment \
           vcube-app=krishnamohan2004/python:${{ github.sha }}
 
-      - name: Check Rollout Status
+      - name: Wait for Deployment
         run: |
-          kubectl rollout status deployment/vcube-deployment --timeout=300s
+          for i in {1..30}; do
+            READY=$(kubectl get deployment vcube-deployment -o jsonpath='{.status.readyReplicas}' 2>/dev/null || echo 0)
+            DESIRED=$(kubectl get deployment vcube-deployment -o jsonpath='{.spec.replicas}' 2>/dev/null || echo 1)
+            if [ "$READY" == "$DESIRED" ]; then
+              echo "Deployment is ready with $READY/$DESIRED replicas"
+              break
+            fi
+            echo "Waiting for deployment... ($READY/$DESIRED ready)"
+            sleep 10
+          done
 
       - name: Get Pods
         run: |
