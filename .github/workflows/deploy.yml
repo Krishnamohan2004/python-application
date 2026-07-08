@@ -46,15 +46,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        with:
-          args: >
-            -Dsonar.projectKey=vcube-python-app
-            -Dsonar.projectName=Vcube Python Application
-            -Dsonar.projectVersion=1.0
-            -Dsonar.sources=.
-            -Dsonar.inclusions=**/*.py,**/*.jsx,**/*.js
-            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/__pycache__/**,**/client/public/**
-            -Dsonar.python.version=3.11
+        # No args needed - all config is in sonar-project.properties
 
       - name: SonarQube Quality Gate Check
         uses: SonarSource/sonarqube-quality-gate-action@master
@@ -62,6 +54,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
 
   # ─────────────────────────────────────────────
   # JOB 2: Build and Push Docker Image to Docker Hub
