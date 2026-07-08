@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vcube-deployment
+  labels:
+    app: vcube
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vcube
+  template:
+    metadata:
+      labels:
+        app: vcube
+    spec:
+      containers:
+        - name: vcube-app
+          image: krishnamohan2004/python:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+              name: http
+          env:
+            - name: DATA_DIR
+              value: "/app/data"
+          volumeMounts:
+            - name: vcube-storage
+              mountPath: "/app/data"
+      volumes:
+        - name: vcube-storage
+          persistentVolumeClaim:
+            claimName: vcube-data-pvc

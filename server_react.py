@@ -7,8 +7,9 @@ app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024 * 1024  # 5GB
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-JSON_FILE = os.path.join(BASE_DIR, 'videos.json')
-STUDENTS_FILE = os.path.join(BASE_DIR, 'students.json')
+DATA_DIR = os.environ.get('DATA_DIR', BASE_DIR)
+JSON_FILE = os.path.join(DATA_DIR, 'videos.json')
+STUDENTS_FILE = os.path.join(DATA_DIR, 'students.json')
 
 def read_json():
     if not os.path.exists(JSON_FILE): return {}
@@ -66,7 +67,7 @@ def upload_chunk():
         return jsonify({"success": False, "error": "Missing data"}), 400
 
     safe_name = secure_filename(filename)
-    temp_path = os.path.join(BASE_DIR, f"{safe_name}.part")
+    temp_path = os.path.join(DATA_DIR, f"{safe_name}.part")
 
     if chunk_index == 0:
         print(f"INFO: Starting new upload: {safe_name}")
@@ -92,8 +93,8 @@ def finalize_upload():
     title = request.form.get('title', 'Untitled')
 
     safe_name = secure_filename(filename)
-    temp_path = os.path.join(BASE_DIR, f"{safe_name}.part")
-    final_path = os.path.join(BASE_DIR, safe_name)
+    temp_path = os.path.join(DATA_DIR, f"{safe_name}.part")
+    final_path = os.path.join(DATA_DIR, safe_name)
 
     if os.path.exists(temp_path):
         if os.path.exists(final_path): os.remove(final_path)
@@ -181,9 +182,16 @@ def student_login_backend():
 
 @app.route('/<path:filename>')
 def serve_others(filename):
+    # Try reading from DATA_DIR (dynamic/persistent data) first
+    data_path = os.path.join(DATA_DIR, filename)
+    if os.path.exists(data_path) and os.path.isfile(data_path):
+        return send_from_directory(DATA_DIR, filename)
+        
+    # Fall back to BASE_DIR (built-in static assets)
     file_path = os.path.join(BASE_DIR, filename)
     if os.path.exists(file_path) and os.path.isfile(file_path):
         return send_from_directory(BASE_DIR, filename)
+        
     return send_from_directory(os.path.join(BASE_DIR, 'client', 'dist'), 'index.html')
 
 if __name__ == '__main__':
