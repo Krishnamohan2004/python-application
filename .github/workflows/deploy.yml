@@ -141,3 +141,6 @@ jobs:
       - name: Display Service External IP
         run: |
           kubectl get svc vcube-service
+
+
+          
